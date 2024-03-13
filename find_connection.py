@@ -2,41 +2,52 @@ import ast
 from collections import deque
 
 import pandas as pd
-from flask import Flask
+from flask import Flask, request
 from nba_api.stats.static import players
 
 app = Flask(__name__)
 
-visited = set()
 player_data = pd.read_csv('player_data_test.csv', converters={'teammates': lambda x: set(ast.literal_eval(x))},
                           index_col=0)
 
-
 @app.route('/')
-def find_connection(first_player, second_player):
+def find_connection():
+    first_player = request.args.get('first_player')
+    second_player = request.args.get('second_player')
+
+    if first_player is None or second_player is None:
+        return 'Please provide both first_player and second_player parameters'
+
+    visited = set()
     initial, target = get_players(first_player, second_player)
+    if len(initial) == 0 or len(target) == 0:
+        return 'Player not found'
+
+    initial = initial[0]
+    target = target[0]
+
     queue = deque([(initial['id'], [])])
 
-    return start_search(target['id'], queue)
+    return start_search(target['id'], queue, visited)
 
 
 def get_players(p1, p2):
-    player1 = players.find_players_by_full_name(p1)[0]
-    player2 = players.find_players_by_full_name(p2)[0]
+    player1 = players.find_players_by_full_name(p1)
+    player2 = players.find_players_by_full_name(p2)
     return player1, player2
 
 
-def start_search(target_id, queue):
+def start_search(target_id, queue, visited):
     while queue:
         player_id, path = queue.popleft()
-        found_path = handle_player(target_id, player_id, path, queue)
+        found_path = handle_player(target_id, player_id, path, queue, visited)
         if found_path is not None:
             return found_path
     else:
-        print('No connection found')
+        return 'No connection found'
 
 
-def handle_player(target_id, player_id, path, queue):
+def handle_player(target_id, player_id, path, queue, visited):
     # Check if player has been visited
     if player_id in visited:
         return
@@ -48,13 +59,13 @@ def handle_player(target_id, player_id, path, queue):
         return
 
     for teammate in teammates.iloc[0]:
-        formatted_path = check_teammate(teammate, target_id, path, queue)
+        formatted_path = check_teammate(teammate, target_id, path, queue, visited)
         if formatted_path is not None:
             return formatted_path
 
 
 # Check if teammate is the target player. If so, return the path. Else, add the teammate to the queue
-def check_teammate(teammate, target_id, path, queue):
+def check_teammate(teammate, target_id, path, queue, visited):
     teammate_id = teammate[0]
     if teammate_id in visited:
         return
