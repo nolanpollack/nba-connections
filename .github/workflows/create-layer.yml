@@ -1,6 +1,11 @@
 name: Create Lambda Layer
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - requirements.txt
   workflow_dispatch:
 
 jobs:
