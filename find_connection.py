@@ -7,40 +7,13 @@ from nba_api.stats.static import players
 player_data = pd.read_csv('player_data.csv', converters={'teammates': lambda x: set(ast.literal_eval(x))},
                           index_col=0)
 
-def lambda_handler(event, context):
-    initial = "LeBron James"
-    target = "Michael Jordan"
-    try:
-        if (event['queryStringParameters']) and (event['queryStringParameters']['initial']) and (
-                event['queryStringParameters']['initial'] is not None):
-            initial = event['queryStringParameters']['initial']
-    except KeyError:
-        print('No initial player provided')
 
-    try:
-        if (event['queryStringParameters']) and (event['queryStringParameters']['target']) and (
-                event['queryStringParameters']['target'] is not None):
-            target = event['queryStringParameters']['target']
-    except KeyError:
-        print('No initial player provided')
-
-    response = {
-        "statusCode": 200,
-        "headers": {
-            "Content-Type": "application/json",
-        },
-        "body": find_connection(initial, target)
-    }
-
-    return response
-
-def find_connection(first_player, second_player):
-
-    if first_player is None or second_player is None:
+def find_connection(initial, target):
+    if initial is None or target is None:
         return 'Please provide both first_player and second_player parameters'
 
     visited = set()
-    initial, target = get_players(first_player, second_player)
+    initial, target = get_players(initial, target)
     if len(initial) == 0 or len(target) == 0:
         return 'Player not found'
 
