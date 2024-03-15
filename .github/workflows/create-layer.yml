@@ -25,8 +25,8 @@ jobs:
 
       - name: Package dependencies
         run: |
-          mkdir -p python/lib/python3.10/site-packages
-          pip install -r requirements.txt -t python/lib/python3.10/site-packages
+          mkdir -p python
+          pip install -r requirements.txt -t python
           zip -r9 ${GITHUB_WORKSPACE}/layer.zip python
 
       - name: Upload layer to S3
