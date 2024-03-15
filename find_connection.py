@@ -2,14 +2,29 @@ from collections import deque
 
 from nba_api.stats.static import players
 
-def find_connection(initial, target, player_data):
+class Response:
+    def __init__(self, status_code, headers, body):
+        self.status_code = status_code
+        self.headers = headers
+        self.body = body
+
+    def to_dict(self):
+        return {
+            "statusCode": self.status_code,
+            "headers": self.headers,
+            "body": self.body
+        }
+
+def find_connection(initial, target, player_data) -> Response:
     if initial is None or target is None:
-        return 'Please provide both first_player and second_player parameters'
+        return Response(400, {"Content-Type": "application/json"}, 'Please provide both p1 and p2 parameters')
 
     visited = set()
     initial, target = get_players(initial, target)
-    if len(initial) == 0 or len(target) == 0:
-        return 'Player not found'
+    if len(initial) == 0:
+        return Response(400, {"Content-Type": "application/json"}, 'Player {} not found'.format(initial))
+    if len(target) == 0:
+        return Response(400, {"Content-Type": "application/json"}, 'Player {} not found'.format(target))
 
     initial = initial[0]
     target = target[0]
@@ -20,19 +35,23 @@ def find_connection(initial, target, player_data):
 
 
 def get_players(p1, p2):
+    # Replace + with space
+    p1 = p1.replace('+', ' ')
+    p2 = p2.replace('+', ' ')
+
     player1 = players.find_players_by_full_name(p1)
     player2 = players.find_players_by_full_name(p2)
     return player1, player2
 
 
-def start_search(target_id, queue, visited, player_data):
+def start_search(target_id, queue, visited, player_data) -> Response:
     while queue:
         player_id, path = queue.popleft()
         found_path = handle_player(target_id, player_id, path, queue, visited, player_data)
         if found_path is not None:
-            return found_path
+            return Response(200, {"Content-Type": "application/json"}, found_path)
     else:
-        return 'No connection found'
+        return Response(200, {"Content-Type": "application/json"}, 'No connection found')
 
 
 def handle_player(target_id, player_id, path, queue, visited, player_data):

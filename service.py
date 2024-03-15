@@ -12,6 +12,8 @@ def handler(event, context):
     initial = event['queryStringParameters']['p1']
     target = event['queryStringParameters']['p2']
 
+    return find_connection(initial, target, player_data)
+
     return {
         "statusCode": 200,
         "headers": {
