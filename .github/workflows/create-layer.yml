@@ -17,9 +17,7 @@ jobs:
 
       - name: Navigate to root directory
         run:
-          ls
           cd $GITHUB_WORKSPACE
-          ls
 
 
       - name: Activate virtual environment
