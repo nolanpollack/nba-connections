@@ -1,9 +1,7 @@
 name: Create Lambda Layer
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   create_lambda_layer:
@@ -29,8 +27,7 @@ jobs:
         run: |
           mkdir -p python/lib/python3.10/site-packages
           pip install -r requirements.txt -t python/lib/python3.10/site-packages
-          cd python/lib/python3.10/site-packages
-          zip -r9 ${GITHUB_WORKSPACE}/layer.zip .
+          zip -r9 ${GITHUB_WORKSPACE}/layer.zip python
 
       - name: Upload layer to S3
         uses: aws-actions/configure-aws-credentials@v1
