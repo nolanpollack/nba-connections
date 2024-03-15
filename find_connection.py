@@ -1,14 +1,9 @@
 import ast
 from collections import deque
 
-import pandas as pd
 from nba_api.stats.static import players
 
-player_data = pd.read_csv('player_data.csv', converters={'teammates': lambda x: set(ast.literal_eval(x))},
-                          index_col=0)
-
-
-def find_connection(initial, target):
+def find_connection(initial, target, player_data):
     if initial is None or target is None:
         return 'Please provide both first_player and second_player parameters'
 
@@ -22,7 +17,7 @@ def find_connection(initial, target):
 
     queue = deque([(initial['id'], [])])
 
-    return start_search(target['id'], queue, visited)
+    return start_search(target['id'], queue, visited, player_data)
 
 
 def get_players(p1, p2):
@@ -31,17 +26,17 @@ def get_players(p1, p2):
     return player1, player2
 
 
-def start_search(target_id, queue, visited):
+def start_search(target_id, queue, visited, player_data):
     while queue:
         player_id, path = queue.popleft()
-        found_path = handle_player(target_id, player_id, path, queue, visited)
+        found_path = handle_player(target_id, player_id, path, queue, visited, player_data)
         if found_path is not None:
             return found_path
     else:
         return 'No connection found'
 
 
-def handle_player(target_id, player_id, path, queue, visited):
+def handle_player(target_id, player_id, path, queue, visited, player_data):
     # Check if player has been visited
     if player_id in visited:
         return
@@ -53,25 +48,25 @@ def handle_player(target_id, player_id, path, queue, visited):
         return
 
     for teammate in teammates.iloc[0]:
-        formatted_path = check_teammate(teammate, target_id, path, queue, visited)
+        formatted_path = check_teammate(teammate, target_id, path, queue, visited, player_data)
         if formatted_path is not None:
             return formatted_path
 
 
 # Check if teammate is the target player. If so, return the path. Else, add the teammate to the queue
-def check_teammate(teammate, target_id, path, queue, visited):
+def check_teammate(teammate, target_id, path, queue, visited, player_data):
     teammate_id = teammate[0]
     if teammate_id in visited:
         return
 
     new_path = path + [(teammate_id, teammate[1], teammate[2])]
     if teammate_id == target_id:
-        return get_formatted_path(new_path)
+        return get_formatted_path(new_path, player_data)
 
     queue.append((teammate_id, new_path))
 
 
-def get_formatted_path(unformatted_path):
+def get_formatted_path(unformatted_path, player_data):
     formatted_path = []
     for player in unformatted_path:
         player_name = player_data.loc[player_data.index == player[0], 'full_name'].iloc[0]
