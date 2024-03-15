@@ -1,0 +1,42 @@
+name: Create Lambda Layer
+
+on:
+  workflow_dispatch:
+
+jobs:
+  create_lambda_layer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10  # Use the same Python version as your virtual environment
+
+      - name: Activate virtual environment
+        run: source /venv/bin/activate
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Zip dependencies
+        run: |
+          cd /venv/lib/python3.10/site-packages
+          zip -r ../layer.zip .
+
+      - name: Upload layer to S3
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-2 # Change to your desired AWS region
+      - run:
+          S3_BUCKET=nba-connections
+          S3_KEY=dependencies.zip
+          aws s3 cp layer.zip s3://$S3_BUCKET/$S3_KEY
+          aws lambda publish-layer-version \
+            --layer-name dependencies \
+            --content S3Bucket=$S3_BUCKET,S3Key=$S3_KEY \
+            --compatible-runtimes python3.10
