@@ -1,5 +1,5 @@
 from collections import deque
-
+import json
 from nba_api.stats.static import players
 
 class Response:
@@ -12,7 +12,7 @@ class Response:
         return {
             "statusCode": self.status_code,
             "headers": self.headers,
-            "body": self.body
+            "body": json.dumps(self.body)
         }
 
 def find_connection(initial, target, player_data) -> Response:
