@@ -1,4 +1,3 @@
-import ast
 from collections import deque
 
 from nba_api.stats.static import players

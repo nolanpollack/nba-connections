@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from find_connection import find_connection
+import ast
 import pandas as pd
 
 player_data = None
