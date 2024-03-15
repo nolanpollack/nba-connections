@@ -42,11 +42,11 @@ def handle_player(target_id, player_id, path, queue, visited, player_data):
     visited.add(player_id)
 
     # Get teammates of player
-    teammates = player_data.loc[player_data.index == player_id, 'teammates']
+    teammates = player_data.loc[player_data.index == player_id]
     if teammates.size == 0:
         return
 
-    for teammate in teammates.iloc[0]:
+    for teammate in teammates.itertuples():
         formatted_path = check_teammate(teammate, target_id, path, queue, visited, player_data)
         if formatted_path is not None:
             return formatted_path
@@ -54,11 +54,11 @@ def handle_player(target_id, player_id, path, queue, visited, player_data):
 
 # Check if teammate is the target player. If so, return the path. Else, add the teammate to the queue
 def check_teammate(teammate, target_id, path, queue, visited, player_data):
-    teammate_id = teammate[0]
+    teammate_id = teammate.teammate_id
     if teammate_id in visited:
         return
 
-    new_path = path + [(teammate_id, teammate[1], teammate[2])]
+    new_path = path + [(teammate_id, teammate.team_name, teammate.season)]
     if teammate_id == target_id:
         return get_formatted_path(new_path, player_data)
 
@@ -69,5 +69,5 @@ def get_formatted_path(unformatted_path, player_data):
     formatted_path = []
     for player in unformatted_path:
         player_name = player_data.loc[player_data.index == player[0], 'full_name'].iloc[0]
-        formatted_path.append({"team": player[2], "year": player[1], "player": player_name})
+        formatted_path.append({"team": player[1], "year": player[2], "player": player_name})
     return formatted_path

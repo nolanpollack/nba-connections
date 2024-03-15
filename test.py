@@ -2,8 +2,10 @@ from service import handler
 
 def test_handler():
     event = {
-        "p1": "LeBron James",
-        "p2": "Kareem Abdul-Jabbar"
+        "queryStringParameters": {
+            "p1": "Lebron James",
+            "p2": "Kyrie Irving"
+        }
     }
     response = handler(event, None)
     assert response["statusCode"] == 200

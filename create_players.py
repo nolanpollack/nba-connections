@@ -16,4 +16,12 @@ for player in players:
     player_data.append({'id': player[0], 'full_name':player[3], 'teammates': teammates})
 
 df = pd.DataFrame(player_data, columns=['id', 'full_name', 'teammates'])
-df.to_csv('player_data_test.csv', index=False)
+
+df = df[df['teammates'].apply(len) > 0]
+
+df = df.explode('teammates')
+df[['teammate_id', 'team_name', 'season']] = pd.DataFrame(df['teammates'].tolist(), index=df.index)
+df.drop('teammates', axis=1, inplace=True)
+
+
+df.to_parquet('player_data_new.parquet')
