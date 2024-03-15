@@ -1,4 +1,4 @@
-region: us-east-1
+region: us-east-2
 
 function_name: nba_find_connection
 handler: service.handler
@@ -13,8 +13,8 @@ runtime: python3.6
 
 # if access key and secret are left blank, boto will use the credentials
 # defined in the [default] section of ~/.aws/credentials.
-aws_access_key_id: LAMBDA_ACCESS_KEY
-aws_secret_access_key: LAMBDA_SECRET_KEY
+aws_access_key_id:
+aws_secret_access_key:
 
 # dist_directory: dist
 # timeout: 15
