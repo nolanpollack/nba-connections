@@ -32,7 +32,7 @@ jobs:
       - name: 🚀 Deploy Modified Files
         run: |
           # Constants
-          S3_BUCKET=nba-find-connection
+          S3_BUCKET=nba-connections
           S3_KEY=nba-connections.zip
           LAMBDA_FUNCTION_NAME=nba-find-connection
           # Download the existing zip from S3
