@@ -1,11 +1,18 @@
 name: Create Lambda Layer
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   create_lambda_layer:
     runs-on: ubuntu-latest
+
+    env:
+      S3_BUCKET_NAME: nba-connections
+      S3_KEY: dependencies.zip
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -15,21 +22,15 @@ jobs:
         with:
           python-version: 3.10.12  # Use the same Python version as your virtual environment
 
-      - name: Navigate to root directory
-        run:
-          ls
-
-
-      - name: Activate virtual environment
-        run: source venv/bin/activate
-
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Zip dependencies
+      - name: Package dependencies
         run: |
-          cd venv/lib/python3.10/site-packages
-          zip -r ../layer.zip .
+          mkdir -p python/lib/python3.10/site-packages
+          pip install -r requirements.txt -t python/lib/python3.10/site-packages
+          cd python/lib/python3.10/site-packages
+          zip -r9 ${GITHUB_WORKSPACE}/layer.zip .
 
       - name: Upload layer to S3
         uses: aws-actions/configure-aws-credentials@v1
@@ -37,11 +38,4 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2 # Change to your desired AWS region
-      - run:
-          S3_BUCKET=nba-connections
-          S3_KEY=dependencies.zip
-          aws s3 cp layer.zip s3://$S3_BUCKET/$S3_KEY
-          aws lambda publish-layer-version \
-            --layer-name dependencies \
-            --content S3Bucket=$S3_BUCKET,S3Key=$S3_KEY \
-            --compatible-runtimes python3.10
+      - run: aws s3 cp layer.zip s3://$S3_BUCKET_NAME/$S3_KEY
