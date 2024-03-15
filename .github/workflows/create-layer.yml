@@ -16,14 +16,14 @@ jobs:
           python-version: 3.10.12  # Use the same Python version as your virtual environment
 
       - name: Activate virtual environment
-        run: source /venv/bin/activate
+        run: source ./venv/bin/activate
 
       - name: Install dependencies
         run: pip install -r requirements.txt
 
       - name: Zip dependencies
         run: |
-          cd /venv/lib/python3.10/site-packages
+          cd ./venv/lib/python3.10/site-packages
           zip -r ../layer.zip .
 
       - name: Upload layer to S3
