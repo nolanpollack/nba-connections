@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-from find_connection import find_connection
-import pandas as pd
+from find_connection_networkx import find_connection
+import pickle
 
-player_data = None
+player_graph = None
 
 def handler(event, context):
-    global player_data
-    if player_data is None:
-        player_data = pd.read_parquet('player_data.parquet')
+    global player_graph
+    if player_graph is None:
+        player_graph = pickle.load(open('player_graph.pickle', 'rb'))
 
     initial = event['queryStringParameters']['p1']
     target = event['queryStringParameters']['p2']
 
-    return find_connection(initial, target, player_data).to_dict()
+    return find_connection(initial, target, player_graph).to_dict()

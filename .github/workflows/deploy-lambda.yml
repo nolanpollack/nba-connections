@@ -35,6 +35,8 @@ jobs:
           S3_BUCKET=nba-connections
           S3_KEY=nba-connections.zip
           LAMBDA_FUNCTION_NAME=nba-find-connection
+          REQUIRED_FILES=("service.py" "find_connection_networkx.py" "response".py) # Add the files that you want to deploy here. 
+
           # Download the existing zip from S3
           aws s3 cp s3://$S3_BUCKET/$S3_KEY existing_lambda.zip
           # Unzip the existing package
@@ -42,7 +44,7 @@ jobs:
           # Copy only the modified .py files from the commit into the unzipped directory
           # This will maintain their directory structure.
           for file in $(git diff-tree --no-commit-id --name-only -r HEAD); do
-              if [[ $file == *.py ]]; then
+              if [[ $file in "${ALLOWED_PYTHON_FILES[@]}" ]]; then
                   # Create the directory structure in lambda_env for the modified file
                   mkdir -p lambda_env/$(dirname $file)
                   # Copy the modified file
