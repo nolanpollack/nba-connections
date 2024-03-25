@@ -42,7 +42,7 @@ jobs:
           # Unzip the existing package
           unzip existing_lambda.zip -d lambda_env
           # Copy allowed Python files
-          for file in "${ALLOWED_PYTHON_FILES[@]}"; do
+          for file in "${REQUIRED_FILES[@]}"; do
               if [[ -e $file ]]; then
                   # Create the directory structure in lambda_env for the allowed file
                   mkdir -p lambda_env/$(dirname $file)
@@ -53,10 +53,10 @@ jobs:
               fi
           done
           
-          # Remove files not in ALLOWED_PYTHON_FILES from lambda_env
+          # Remove files not in REQUIRED_FILES from lambda_env
           for file in $(find lambda_env -type f); do
-              if ! [[ "${ALLOWED_PYTHON_FILES[@]}" =~ $(echo $file | sed 's/lambda_env\///') ]]; then
-                  echo "File $file is not in ALLOWED_PYTHON_FILES, removing..."
+              if ! [[ "${REQUIRED_FILES[@]}" =~ $(echo $file | sed 's/lambda_env\///') ]]; then
+                  echo "File $file is not in REQUIRED_FILES, removing..."
                   rm $file
               fi
           done
