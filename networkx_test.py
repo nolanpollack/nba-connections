@@ -55,7 +55,7 @@ def get_shortest_paths_teams(player_name):
     for node, path in shortest_paths.items():
         player_node = create_nested_structure_teams(player_node, path, player_graph)
 
-    json.dump(player_node.to_dict(), open('paths_teams.json', 'w'))
+    json.dump(player_node.to_dict(), open(f'paths_teams_{player_name.lower().replace(" ", "_")}.json', 'w'))
 
 
 def create_nested_structure(data, paths, player_graph):
@@ -121,4 +121,4 @@ def create_nested_structure_teams(player_node: PlayerNode, paths, player_graph) 
         return player_node
 
 
-get_shortest_paths_teams('LeBron James')
+get_shortest_paths_teams('Victor Wembanyama')
