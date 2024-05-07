@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - '**.py' # Change to the file extension of the language that you are using.
+      - "**.py" # Change to the file extension of the language that you are using.
   workflow_dispatch: # This is to manually trigger the workflow
 
 jobs:
@@ -50,9 +50,11 @@ jobs:
                   cp $file lambda_env/$file
                   # Print what you've done with the file
                   echo "Copied $file to lambda_env/$file"
+          else
+                echo "File $file does not exist, skipping..."
               fi
           done
-          
+
           # Remove files not in REQUIRED_FILES from lambda_env
           for file in $(find lambda_env -type f); do
               if ! [[ "${REQUIRED_FILES[@]}" =~ $(echo $file | sed 's/lambda_env\///') ]]; then
@@ -60,7 +62,7 @@ jobs:
                   rm $file
               fi
           done
-          
+
           # Zip the directory again
           cd lambda_env
           zip -r ../updated_lambda.zip .
@@ -72,3 +74,4 @@ jobs:
           # Cleanup
           rm -r lambda_env
           rm existing_lambda.zip updated_lambda.zip
+
