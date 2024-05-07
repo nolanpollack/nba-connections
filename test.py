@@ -4,8 +4,7 @@ from service import handler
 def test_handler():
     event = {
         "queryStringParameters": {
-            "p1": "Victor+Wembanyama",
-            "p2": "Al+Brightman"
+            "player": "Michael+Jordan"
         }
     }
     response = handler(event, None)

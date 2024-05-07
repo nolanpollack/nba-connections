@@ -47,8 +47,7 @@ def get_shortest_paths(player_name):
     json.dump(json_data, open("paths_wemby.json", "w"))
 
 
-def get_shortest_paths_teams(player_name):
-    player_id = players.find_players_by_full_name(player_name)[0]["id"]
+def get_shortest_paths_teams(player_id):
     player_graph = pickle.load(open("player_graph.pickle", "rb"))
     shortest_paths = nx.single_source_shortest_path(player_graph, player_id)
     # Convert the paths to the desired JSON format

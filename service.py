@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 import pickle
 
-from find_connection_networkx import find_connection
-from get_team_graph import get_shortest_paths_teams
+from find_team_connection import find_connection as find_team_connection
 
 player_graph = None
 
@@ -17,4 +16,4 @@ def handler(event, context):
     #
     # return find_connection(initial, target, player_graph).to_dict()
     player_name = event["queryStringParameters"]["player"]
-    return get_shortest_paths_teams(player_name).to_dict()
+    return find_team_connection(player_name).to_dict()
